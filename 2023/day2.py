@@ -2,10 +2,9 @@ def solution():
     sum = 0
     with open("data/day2.txt") as file:
         for line in file:
-            cond = True
-            id = int(line[5 : line.index(":")])
             cubes = (
-                line[line.index(":") + 2 :].strip(" \n").replace(";", ",").split(", ")
+                line[line.index(":") +
+                     2:].strip(" \n").replace(";", ",").split(", ")
             )
 
             red = green = blue = 0

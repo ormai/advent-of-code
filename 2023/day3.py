@@ -32,13 +32,15 @@ def partOne():
                         (
                             i - 1 >= 0
                             and re.search(
-                                SYMBOLS, schematic[i - 1][substringStart:substringEnd]
+                                SYMBOLS, schematic[i -
+                                                   1][substringStart:substringEnd]
                             )
                         )
                         or (
                             i + 1 < len(schematic)
                             and re.search(
-                                SYMBOLS, schematic[i + 1][substringStart:substringEnd]
+                                SYMBOLS, schematic[i +
+                                                   1][substringStart:substringEnd]
                             )
                         )
                         or re.search(SYMBOLS, schematic[i][substringStart:substringEnd])
@@ -65,10 +67,8 @@ def partTwo():
 
 
 def gearRatio(mat, i, j):
-    ratio = 0
     leftBarrier = j - 3
     rightBarrier = j + 3
-    first = second = 0
 
     numbers = []
 
@@ -131,7 +131,7 @@ def gearRatio(mat, i, j):
         numbers.append(mat[i][leftBarrier:j].lstrip(".*$#@/=+-&"))
 
     if j + 1 <= len(mat[i]) and mat[i][j + 1].isdigit():
-        numbers.append(mat[i][j + 1 : rightBarrier + 1].rstrip(".*$#@/=+-&"))
+        numbers.append(mat[i][j + 1: rightBarrier + 1].rstrip(".*$#@/=+-&"))
 
     if len(numbers) < 2:
         return 0

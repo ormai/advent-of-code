@@ -1,23 +1,20 @@
-import regex
+from regex import search, REVERSE
 
 
 def solution():
-    with open("data/day1.txt") as file:
-        DIGIT = r"one|two|three|four|five|six|seven|eight|nine|1|2|3|4|5|6|7|8|9"
-        sum = 0
-        for line in file:
-            value = ""
+    DIGITS = r"one|two|three|four|five|six|seven|eight|nine|1|2|3|4|5|6|7|8|9"
 
-            l = regex.search(DIGIT, line)
-            if l:
-                value += l.group() if l.group().isdigit() else toDigit(l.group())
+    runningSum = 0
+    lines = open("data/day1.txt").read().splitlines()
+    for line in lines:
+        if (left := search(DIGITS, line).group()) and (
+            right := search(DIGITS, line, REVERSE).group()
+        ):
+            left = left if left.isdigit() else left.toDigit()
+            right = right if right.isdigit() else right.toDigit()
+            runningSum += int(left + right)
 
-            r = regex.search(DIGIT, line, regex.REVERSE)
-            if r:
-                value += r.group() if r.group().isdigit() else toDigit(r.group())
-
-            sum += int(value)
-        print(sum)
+    print(runningSum)
 
 
 def toDigit(word):
