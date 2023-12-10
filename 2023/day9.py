@@ -12,7 +12,7 @@ def extract(arr, part):
         return 0
 
     differences = [y - x for x, y in zip(arr, arr[1:])]
-    return arr[part] + extract(differences, part)
+    return arr[part] - extract(differences, part)
     # arr[-1] is part 1
     # arr[0] is part 2
 
