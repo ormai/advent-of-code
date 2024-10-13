@@ -1,7 +1,8 @@
 from math import gcd
 
 # first, second, all other lines
-instructions, _, *nodes = open("data/day8.txt").read().splitlines()
+with open("input") as input:
+    instructions, _, *nodes = input.read().splitlines()
 
 network = {}
 for node in nodes:
