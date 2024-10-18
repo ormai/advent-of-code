@@ -24,3 +24,6 @@ def solution():
 
 
 solution()
+
+with open("input") as input:
+

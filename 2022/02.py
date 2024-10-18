@@ -12,7 +12,6 @@ with open("input") as tournament:
         # part two
         if me == "X":
             score_p2 += (SHAPES[opp] - 1) % 3
-            print((SHAPES[opp] - 1) % 3 + 1)
         elif me == "Y":
             score_p2 += SHAPES[opp] + 3
         elif me == "Z":
