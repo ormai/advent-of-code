@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ $# = 2 ]; then
+  year=$1
+  day=$2
+elif [ $# = 1 ]; then
+  year=$(date +%Y)
+  day=$1
+else
+  year=$(date +%Y)
+  day_zero_padded=$(date +%d)
+  day=${day_zero_padded##0}
+fi
+
+curl -s -JLO --cookie session="$(cat ~/dev/advent-of-code/.session_token)" \
+  "https://adventofcode.com/$year/day/$day/input"
