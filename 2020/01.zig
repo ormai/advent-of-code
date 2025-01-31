@@ -1,5 +1,6 @@
 const std = @import("std");
 const input = @embedFile("input");
+const out = std.io.getStdOut().writer();
 
 pub fn main() !void {
     var nums: [200]u32 = undefined;
@@ -12,11 +13,11 @@ pub fn main() !void {
     for (nums, 0..) |a, i| {
         for (nums[i + 1 ..], 0..) |b, j| {
             if (a + b == 2020) {
-                std.debug.print("Part one: {d}\n", .{a * b});
+                try out.print("Part one: {d}\n", .{a * b});
             }
             for (nums[i + j + 1 ..]) |c| {
                 if (a + b + c == 2020) {
-                    std.debug.print("Part two: {d}\n", .{a * b * c});
+                    try out.print("Part two: {d}\n", .{a * b * c});
                 }
             }
         }
