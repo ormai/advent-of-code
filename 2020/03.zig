@@ -1,9 +1,18 @@
 const std = @import("std");
 const input = @embedFile("input");
 
-pub fn main() void {
-    const trees = [_]u32{ treesInSlope(1, 1), treesInSlope(3, 1), treesInSlope(5, 1), treesInSlope(7, 1), treesInSlope(1, 2) };
-    std.debug.print("Part one: {d}\nPart two: {d}\n", .{ trees[1], multiplyAll(&trees) });
+pub fn main() !void {
+    const trees = [_]u32{
+        treesInSlope(1, 1),
+        treesInSlope(3, 1),
+        treesInSlope(5, 1),
+        treesInSlope(7, 1),
+        treesInSlope(1, 2),
+    };
+    try std.io.getStdOut().writer().print(
+        "Part one: {d}\nPart two: {d}\n",
+        .{ trees[1], multiplyAll(&trees) },
+    );
 }
 
 fn treesInSlope(right: usize, down: usize) u32 {

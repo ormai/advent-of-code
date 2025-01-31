@@ -1,8 +1,11 @@
 const std = @import("std");
 const input = @embedFile("input");
 
-pub fn main() void {
-    std.debug.print("Part one: {d}\nPart two: {d}\n", .{ partOne(), partTwo() });
+pub fn main() !void {
+    try std.io.getStdOut().writer().print(
+        "Part one: {d}\nPart two: {d}\n",
+        .{ partOne(), partTwo() },
+    );
 }
 
 // Counts the number of valid passports

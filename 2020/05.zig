@@ -1,5 +1,6 @@
 const std = @import("std");
 const input = @embedFile("input");
+const out = std.io.getStdOut().writer();
 
 pub fn main() !void {
     var ids = std.ArrayList(i32).init(std.heap.page_allocator);
@@ -34,13 +35,13 @@ pub fn main() !void {
         }
         try ids.append(seat_id);
     }
-    std.debug.print("Part one: {d}\n", .{highest_seat_id});
+    try out.print("Part one: {d}\n", .{highest_seat_id});
 
     std.mem.sort(i32, ids.items, {}, std.sort.asc(i32));
     var win_it = std.mem.window(i32, ids.items, 2, 1);
     while (win_it.next()) |win| {
         if (win[1] - win[0] == 2) {
-            std.debug.print("Part two: {d}\n", .{win[0] + 1});
+            try out.print("Part two: {d}\n", .{win[0] + 1});
         }
     }
 }

@@ -25,5 +25,5 @@ pub fn main() !void {
         }
     }
 
-    std.debug.print("Part one: {d}\nPart two: {d}\n", .{ valid1, valid2 });
+    try std.io.getStdOut().writer().print("Part one: {d}\nPart two: {d}\n", .{ valid1, valid2 });
 }
