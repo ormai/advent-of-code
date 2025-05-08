@@ -5,10 +5,9 @@ OPS = {"AND": and_, "OR": or_, "LSHIFT": lshift, "RSHIFT": rshift}
 
 
 @cache
-def signal(wire: str):
+def signal(wire: str) -> int:
     if wire.isdigit():
         return int(wire)
-
     match wires[wire]:
         case [a]:
             return signal(a)
@@ -16,16 +15,16 @@ def signal(wire: str):
             return ~signal(a)
         case [a, op, b]:
             return OPS[op](signal(a), signal(b))
+    assert False
 
 
-with open("input") as input:
-    wires = {}
-    for line in input.readlines():
-        *expr, _, dst = line.split()
-        wires[dst] = expr
+wires = {}
+for line in open("input").readlines():
+    *expr, _, dst = line.split()
+    wires[dst] = expr
 
-    print(signal("a"))
+print(signal("a"))
 
-    wires["b"] = [str(signal("a"))]
-    signal.cache_clear()
-    print(signal("a"))
+wires["b"] = [str(signal("a"))]
+signal.cache_clear()
+print(signal("a"))

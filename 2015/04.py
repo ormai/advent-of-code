@@ -1,14 +1,13 @@
 from hashlib import md5
 
-secret_key = "yzbqklnj"
+SECRET_KEY = "yzbqklnj"
 
 
-def mine(zeroes):
+def mine(zeroes: int) -> int:
     i = 1
     while True:
-        message = (secret_key + str(i)).encode()
         m = md5()
-        m.update(message)
+        m.update(f"{SECRET_KEY}{i}".encode())
         if m.hexdigest().startswith("0" * zeroes):
             return i
         i += 1

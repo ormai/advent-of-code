@@ -1,19 +1,20 @@
-def deliver(directions, santa_count):
-    pos = [[0, 0] for _ in range(santa_count)]
-    cur = 0  # which santa
-    visited = set(["00"])
+def deliver(directions: str, santa_count: int) -> int:
+    pos = [(0, 0) for _ in range(santa_count)]
+    santa = 0
+    visited = set([(0, 0)])
     for c in directions:
+        x, y = pos[santa]
         match c:
             case ">":
-                pos[cur][0] += 1
+                pos[santa] = x + 1, y
             case "<":
-                pos[cur][0] -= 1
+                pos[santa] = x - 1, y
             case "^":
-                pos[cur][1] += 1
+                pos[santa] = x, y + 1
             case "v":
-                pos[cur][1] -= 1
-        visited.add(str(pos[cur][0]) + str(pos[cur][1]))
-        cur = (cur + 1) % santa_count
+                pos[santa] = x, y - 1
+        visited.add(pos[santa])
+        santa = (santa + 1) % santa_count
     return len(visited)
 
 
