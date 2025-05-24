@@ -1,0 +1,32 @@
+[package]
+name = "advent-of-code-2024"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+itertools = "0.14.0"
+regex = "1.11.1"
+
+# Shared code
+# [lib]
+# path = "lib.rs"
+
+[[bin]]
+name = "01"
+path = "01.rs"
+
+[[bin]]
+name = "02"
+path = "02.rs"
+
+[[bin]]
+name = "03"
+path = "03.rs"
+
+[[bin]]
+name = "07"
+path = "07.rs"
+
+[[bin]]
+name = "10"
+path = "10.rs"
