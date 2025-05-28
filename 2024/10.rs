@@ -5,15 +5,13 @@ const INPUT: &str = include_str!("input");
 fn main() {
     let grid = parse_grid();
     let (score, rating) = walk_the_trail(&grid);
-    println!("{score}");
-    println!("{rating}");
+    println!("{score}\n{rating}");
 }
 
-fn walk_the_trail(grid: &Vec<Vec<u32>>) -> (u32, u32) {
+fn walk_the_trail(grid: &[Vec<u32>]) -> (u32, u32) {
     let size = grid.len();
-    let mut score = 0;
-    let mut rating = 0;
 
+    let (mut score, mut rating) = (0, 0);
     for r in 0..size {
         for c in 0..size {
             if grid[r][c] == 0 {

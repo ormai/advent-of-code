@@ -12,13 +12,16 @@ const DIRECTIONS: [(isize, isize); 8] = [
 
 fn main() {
     let grid: Vec<Vec<char>> = parse_grid(INPUT);
-    println!("{}", word_search(&grid, "XMAS"));
-    println!("{}", x_mas_word_search(&grid));
+    println!(
+        "{}\n{}",
+        word_search(&grid, "XMAS"),
+        x_mas_word_search(&grid)
+    );
 }
 
-fn x_mas_word_search(haystack: &Vec<Vec<char>>) -> u32 {
-    const WORD: [char;3] = ['M', 'A', 'S'];
-    const WORD_REV: [char;3]= ['S', 'A', 'M'];
+fn x_mas_word_search(haystack: &[Vec<char>]) -> u32 {
+    const WORD: [char; 3] = ['M', 'A', 'S'];
+    const WORD_REV: [char; 3] = ['S', 'A', 'M'];
     let mut count = 0;
     for r in 0..haystack.len() {
         for c in 0..haystack[r].len() {
@@ -44,7 +47,7 @@ fn x_mas_word_search(haystack: &Vec<Vec<char>>) -> u32 {
     count
 }
 
-fn word_search(haystack: &Vec<Vec<char>>, needle: &str) -> u32 {
+fn word_search(haystack: &[Vec<char>], needle: &str) -> u32 {
     let word: Vec<char> = needle.chars().collect();
     let mut count = 0;
     for r in 0..haystack.len() {
@@ -55,7 +58,7 @@ fn word_search(haystack: &Vec<Vec<char>>, needle: &str) -> u32 {
                     let (mut r, mut c) = (r, c);
                     for _ in 0..word.len() - 1 {
                         if let Some((nr, nc)) =
-                            in_bounds(&haystack, r as isize + dr, c as isize + dc)
+                            in_bounds(haystack, r as isize + dr, c as isize + dc)
                         {
                             (r, c) = (nr, nc);
                             candidate.push(haystack[r][c]);
@@ -73,7 +76,7 @@ fn word_search(haystack: &Vec<Vec<char>>, needle: &str) -> u32 {
     count
 }
 
-fn in_bounds(grid: &Vec<Vec<char>>, r: isize, c: isize) -> Option<(usize, usize)> {
+fn in_bounds(grid: &[Vec<char>], r: isize, c: isize) -> Option<(usize, usize)> {
     if r >= 0 && c >= 0 {
         let (r, c) = (r as usize, c as usize);
         if r < grid.len() && c < grid[r].len() {

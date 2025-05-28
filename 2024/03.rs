@@ -7,8 +7,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mul = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)")?;
     let command = Regex::new(r"(don't\(\)|do\(\))")?;
 
-    let mut total = 0;
-    let mut conditional = 0;
+    let (mut total, mut conditional) = (0, 0);
     let mut enabled = true;
     for line in INPUT.lines() {
         let mut prev_match_end = 0;
@@ -29,7 +28,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    println!("{total}");
-    println!("{conditional}");
+    println!("{total}\n{conditional}");
     Ok(())
 }
