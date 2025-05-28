@@ -3,8 +3,7 @@ use std::cmp::Ordering;
 const INPUT: &str = include_str!("input");
 
 fn main() {
-    let mut safe_reports = 0;
-    let mut dampened = 0;
+    let (mut safe_reports, mut dampened) = (0, 0);
     for line in INPUT.lines() {
         let levels: Vec<i32> = line
             .split_whitespace()
@@ -16,8 +15,7 @@ fn main() {
             dampened += 1;
         }
     }
-    println!("{safe_reports}");
-    println!("{}", safe_reports + dampened);
+    println!("{safe_reports}\n{}", safe_reports + dampened);
 }
 
 fn can_dampen(levels: &[i32]) -> bool {

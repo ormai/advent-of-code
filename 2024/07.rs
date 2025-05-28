@@ -1,5 +1,4 @@
-use itertools::Itertools;
-use std::iter::repeat;
+use itertools::{Itertools, repeat_n};
 
 const INPUT: &str = include_str!("input");
 
@@ -33,8 +32,7 @@ fn total_calibration(equation: &[Vec<u64>], operators: &[impl Fn(u64, u64) -> u6
     equation
         .iter()
         .filter_map(|nums| {
-            if repeat(operators.iter())
-                .take(nums.len() - 2)
+            if repeat_n(operators.iter(), nums.len() - 2)
                 .multi_cartesian_product()
                 .any(|ops| {
                     nums[2..]

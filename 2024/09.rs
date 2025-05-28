@@ -2,8 +2,11 @@ const INPUT: &str = include_str!("input");
 
 fn main() {
     let disk = parse_disk();
-    println!("{}", fill_free_space(&disk));
-    println!("{}", fill_free_space_without_fragmentation(&disk));
+    println!(
+        "{}\n{}",
+        fill_free_space(&disk),
+        fill_free_space_without_fragmentation(&disk)
+    );
 }
 
 /// Part two. Moves whole files starting from the highest file
@@ -14,8 +17,8 @@ fn main() {
 ///
 /// # Returns:
 /// The checksum of the compacted disk.
-fn fill_free_space_without_fragmentation(disk: &Vec<i32>) -> i64 {
-    let mut disk = disk.clone();
+fn fill_free_space_without_fragmentation(disk: &[i32]) -> i64 {
+    let mut disk = disk.to_owned();
     let mut hi = disk.len();
     while let Some((file_start, file_size)) = get_file(&disk, hi) {
         if let Some(dest_start) = get_free_spot(&disk, file_size, hi) {
@@ -94,10 +97,10 @@ fn get_file(disk: &[i32], limit: usize) -> Option<(usize, usize)> {
 ///
 /// # Returns:
 /// The checksum of the compacted disk.
-fn fill_free_space(disk: &Vec<i32>) -> i64 {
-    let mut disk = disk.clone();
-    let (mut lo, mut hi) = (0, disk.len() - 1);
+fn fill_free_space(disk: &[i32]) -> i64 {
+    let mut disk = disk.to_owned();
 
+    let (mut lo, mut hi) = (0, disk.len() - 1);
     while lo < hi {
         if disk[lo] != -1 {
             lo += 1
@@ -117,7 +120,7 @@ fn fill_free_space(disk: &Vec<i32>) -> i64 {
 ///
 /// # Arguments:
 /// - `disk` - The disk on which to calculate the checksum.
-fn calculate_checksum(disk: &Vec<i32>) -> i64 {
+fn calculate_checksum(disk: &[i32]) -> i64 {
     disk.iter().enumerate().fold(0, |acc, (i, &digit)| {
         if digit == -1 {
             acc
@@ -141,7 +144,7 @@ fn parse_disk() -> Vec<i32> {
         .chars()
         .map(|c| c.to_digit(10).expect("input contains only digits") as usize)
         .enumerate()
-        .map(|(file_id, size)| {
+        .flat_map(|(file_id, size)| {
             let block_value = if file_id.is_multiple_of(2) {
                 (file_id / 2).try_into().expect("file IDs fit into i32")
             } else {
@@ -149,6 +152,5 @@ fn parse_disk() -> Vec<i32> {
             };
             vec![block_value; size]
         })
-        .flatten()
         .collect()
 }

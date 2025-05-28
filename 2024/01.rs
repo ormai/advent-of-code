@@ -3,8 +3,7 @@ use std::collections::HashMap;
 const INPUT: &str = include_str!("input");
 
 fn main() {
-    let mut left = Vec::new();
-    let mut right = Vec::new();
+    let (mut left, mut right) = (Vec::new(), Vec::new());
     for line in INPUT.lines() {
         let mut numbers = line
             .split_whitespace()
@@ -15,8 +14,11 @@ fn main() {
     left.sort_unstable();
     right.sort_unstable();
 
-    println!("{}", distance(&left, &right));
-    println!("{}", similarity_score(&left, &right));
+    println!(
+        "{}\n{}",
+        distance(&left, &right),
+        similarity_score(&left, &right)
+    );
 }
 
 fn distance(left: &[i32], right: &[i32]) -> u32 {
