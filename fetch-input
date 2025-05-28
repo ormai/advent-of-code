@@ -12,5 +12,8 @@ else
   day=${day_zero_padded##0}
 fi
 
-curl -s -JLO --cookie session="$(cat ~/dev/advent-of-code/.session_token)" \
+# This relative path assumes that you are one folder under the root
+TOKEN="$(cat ../.session_token)"
+
+curl -s -JLO --cookie session="$TOKEN" \
   "https://adventofcode.com/$year/day/$day/input"
