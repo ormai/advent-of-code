@@ -28,6 +28,10 @@ name = "04"
 path = "04.rs"
 
 [[bin]]
+name = "05"
+path = "05.rs"
+
+[[bin]]
 name = "07"
 path = "07.rs"
 
