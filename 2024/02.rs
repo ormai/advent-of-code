@@ -41,7 +41,7 @@ fn monotony(levels: &[i32], tonality: Ordering) -> bool {
 fn distance_is_in_range(levels: &[i32]) -> bool {
     levels
         .windows(2)
-        .all(|w| (1..=3).contains(&w[0].abs_diff(w[1])))
+        .all(|w| matches!(w[0].abs_diff(w[1]), 1..=3))
 }
 
 #[test]
