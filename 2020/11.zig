@@ -1,3 +1,5 @@
+//! Seating arrangement problem
+
 const std = @import("std");
 const input = @embedFile("input");
 const directions = [_][2]isize{
