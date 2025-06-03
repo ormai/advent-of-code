@@ -8,7 +8,7 @@ pub fn main() !void {
     );
 }
 
-// Counts the number of valid passports
+/// Count the number of valid passports
 fn partOne() u32 {
     var valid: u32 = 0;
     var it = std.mem.tokenizeSequence(u8, input, "\n\n");
@@ -29,7 +29,7 @@ fn partOne() u32 {
     return valid;
 }
 
-// Counts the number of valid passports with additional checks
+/// Count the number of valid passports with additional checks
 fn partTwo() u32 {
     var valid_passports: u32 = 0;
     var it = std.mem.tokenizeSequence(u8, input, "\n\n");
@@ -62,12 +62,12 @@ fn partTwo() u32 {
                 }
             } else if (std.mem.eql(u8, passport_field[0..3], "hcl")) {
                 if (passport_field[4] == '#' and passport_field[5..].len == 6 and
-                    for (passport_field[5..11]) |c|
+                    for (passport_field[5..11]) |c| {
+                        if (!std.ascii.isHex(c)) {
+                            break false;
+                        }
+                    } else true)
                 {
-                    if (!std.ascii.isHex(c)) {
-                        break false;
-                    }
-                } else true) {
                     fields += 1;
                 }
             } else if (std.mem.eql(u8, passport_field[0..3], "ecl")) {
