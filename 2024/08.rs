@@ -50,7 +50,7 @@ fn count_antinodes_repeat(map: &[Vec<char>]) -> usize {
     let frequencies = categorize_antennas_by_frequency(map);
     let (w, h) = (map.len() as isize, map[0].len() as isize);
     let mut antinodes = HashSet::new();
-    for (_, frequency) in &frequencies {
+    for frequency in frequencies.values() {
         for &(r1, c1) in frequency {
             for &(r2, c2) in frequency {
                 if r1 != r2 || c1 != c2 {
