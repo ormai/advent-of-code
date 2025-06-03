@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 itertools = "0.14.0"
+memoize = "0.5.1"
+num-integer = "0.1.46"
 regex = "1.11.1"
 
 # Shared code
@@ -50,3 +52,7 @@ path = "09.rs"
 [[bin]]
 name = "10"
 path = "10.rs"
+
+[[bin]]
+name = "11"
+path = "11.rs"
