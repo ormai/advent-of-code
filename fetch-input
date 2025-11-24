@@ -13,7 +13,7 @@ else
 fi
 
 # This relative path assumes that you are one folder under the root
-TOKEN="$(cat ../.session_token)"
+TOKEN="$(cat .session_token)"
 
 curl -s -JLO --cookie session="$TOKEN" \
   "https://adventofcode.com/$year/day/$day/input"
