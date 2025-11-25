@@ -149,6 +149,14 @@ impl Puzzle {
     }
 
     /// Creates the solution file from a template. Downloads the input, the example, and the puzzle description.
+    ///
+    /// Adds a new `[[bin]]` table to Cargo.toml.
+    /// Solution: src/{year}/{day}.rs
+    /// Input: data/inputs/{year}/{day}.txt
+    /// Puzzle description: data/puzzles/{year}/{day}.md
+    ///
+    /// If run more than once on a puzzle it will overwrite puzzle description and input. Examples, solution, and
+    /// Cargo.toml are not touched.
     fn scaffold(&self) {
         let solution_path = format!("src/{}/{:02}.rs", self.year, self.day);
 
@@ -186,7 +194,11 @@ mod tests {
             false,
         );
 
+        fs::create_dir_all(format!("data/inputs/{}", self.year))
+            .expect("Ancestors should be created");
         self.client.save_input().expect("failed to download input");
+        fs::create_dir_all(format!("data/puzzles/{}", self.year))
+            .expect("Ancestors should be created");
         self.client
             .save_puzzle_markdown()
             .expect("failed to download puzzle");
