@@ -1,14 +1,12 @@
 use std::{collections::HashMap, fs, io::Error, str::FromStr};
 use tinyjson::JsonValue;
 
-use crate::template::Day;
-
 static TIMINGS_FILE_PATH: &str = "./data/timings.json";
 
 /// Represents benchmark times for a single day.
 #[derive(Clone, Debug)]
 pub struct Timing {
-    pub day: Day,
+    pub day: u32,
     pub part_1: Option<String>,
     pub part_2: Option<String>,
     pub total_nanos: f64,
@@ -60,7 +58,7 @@ impl Timings {
         self.data.iter().map(|x| x.total_nanos).sum::<f64>() / 1_000_000_f64
     }
 
-    pub fn is_day_complete(&self, day: Day) -> bool {
+    pub fn is_day_complete(&self, day: u32) -> bool {
         self.data
             .iter()
             .any(|t| t.day == day && t.part_1.is_some() && t.part_2.is_some())
@@ -148,7 +146,7 @@ impl TryFrom<&JsonValue> for Timing {
         let day = json
             .get("day")
             .and_then(|v| v.get::<String>())
-            .and_then(|day| Day::from_str(day).ok())
+            .and_then(|day| u32::from_str(day).ok())
             .ok_or("Expected timing.day to be a Day struct.")?;
 
         let part_1 = json

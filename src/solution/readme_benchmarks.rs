@@ -2,8 +2,7 @@
 /// The approach taken is similar to how `aoc-readme-stars` handles this.
 use std::{fs, io};
 
-use crate::template::timings::Timings;
-use crate::template::Day;
+use crate::solution::timings::Timings;
 
 static MARKER: &str = "<!--- benchmarking table --->";
 
@@ -26,7 +25,7 @@ pub struct TablePosition {
 }
 
 #[must_use]
-pub fn get_path_for_bin(day: Day) -> String {
+pub fn get_path_for_bin(day: u32) -> String {
     format!("./src/bin/{day}.rs")
 }
 
@@ -67,7 +66,7 @@ fn construct_table(prefix: &str, timings: Timings, total_millis: f64) -> String 
         let path = get_path_for_bin(timing.day);
         lines.push(format!(
             "| [Day {}]({}) | `{}` | `{}` |",
-            timing.day.into_inner(),
+            timing.day,
             path,
             timing.part_1.unwrap_or_else(|| "-".into()),
             timing.part_2.unwrap_or_else(|| "-".into())

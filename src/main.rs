@@ -1,15 +1,13 @@
-use aoc::template::{all_days, readme_benchmarks, run_multi::run_multi, timings::Timings, Day};
-use aoc_client::{AocClient, AocResult};
+use aoc::solution::days;
+use aoc::solution::{aoc_client, readme_benchmarks, run_multi::run_multi, timings::Timings};
+use aoc_client::AocClient;
 use chrono::{Datelike, FixedOffset, Utc};
 use clap::{ArgAction, Command, arg, command, value_parser};
-use std::fs::{self, OpenOptions};
-use std::io::Write;
+use std::fs::{self, File, OpenOptions};
+use std::io::{Read, Write};
 use std::path::Path;
 use std::process;
 use std::{collections::HashSet, process::Stdio};
-
-// TODO: when the user does not provide year and day default to day and print error if not in december before the 25th
-// TODO: replace the use of aoc-cli with https://crates.io/crates/aoc-client
 
 fn main() {
     let matches = cli().get_matches();
@@ -29,11 +27,7 @@ fn main() {
         }
         Some(("scaffold", _)) => puzzle.scaffold(),
         Some(("all", sub_matches)) => {
-            run_multi(
-                &all_days().collect(),
-                sub_matches.get_flag("release"),
-                false,
-            );
+            run_multi(&days().collect(), sub_matches.get_flag("release"), false);
         }
         Some(("time", sub_matches)) => {
             puzzle.time(sub_matches.get_flag("all"), sub_matches.get_flag("store"))
@@ -80,14 +74,6 @@ fn cli() -> Command {
                 .arg(arg!(-a --all "Benchmark all solutions"))
                 .arg(arg!(-s --store "Add benchmark results to the README.md")),
         )
-}
-
-fn aoc_client(year: i32, day: u32) -> AocResult<AocClient> {
-    AocClient::builder()
-        .session_cookie_from_default_locations()?
-        .year(year)?
-        .day(day)?
-        .build()
 }
 
 /// A puzzle in Advent of Code
@@ -168,7 +154,7 @@ impl Puzzle {
 
         write_file(
             &solution_path,
-            &"aoc::solution!(%DAY_NUMBER%);
+            &"aoc::solution!({{YEAR}}, {{DAY}});
 
 pub fn part_one(input: &str) -> Option<u64> {
     None
@@ -184,53 +170,58 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = part_one(&aoc::template::read_file(\"examples\", DAY));
+        let result = part_one(&read_file(\"examples\", YEAR, DAY, Part::One));
         assert_eq!(result, None);
     }
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&aoc::template::read_file(\"examples\", DAY));
+        let result = part_two(&read_file(\"examples\", YEAR, DAY, Part::Two));
         assert_eq!(result, None);
     }
 }
 "
-            .replace("%DAY_NUMBER%", &self.day.to_string()),
+            .replace("{{DAY}}", &self.day.to_string())
+            .replace("{{YEAR}}", &self.year.to_string()),
             false,
         );
-        println!("Created solution file '{solution_path}'");
 
-        let input_path = format!("data/inputs/{}/{:02}.txt", self.year, self.day);
-        write_file(
-            &input_path,
-            &self
-                .client
-                .get_input()
-                .expect("AocClient should return input"),
-            true,
-        );
-        println!("Created input file '{input_path}'");
+        self.client.save_input().expect("failed to download input");
+        self.client
+            .save_puzzle_markdown()
+            .expect("failed to download puzzle");
 
-        // FIXME: this pulls the whole description
-        let example_path = format!("data/examples/{}/{:02}.txt", self.year, self.day);
-        write_file(
-            &example_path,
-            &self
-                .client
-                .get_puzzle_html()
-                .expect("AocClient should return puzzle html"),
-            true,
-        );
-        println!("Created example file \"{}\"", &example_path);
+        let mut contents = String::new();
+        File::open("Cargo.toml")
+            .expect("failed to open Cargo.toml")
+            .read_to_string(&mut contents)
+            .expect("failed to read Cargo.toml");
+        if !contents.contains(&format!("{}-{:02}", self.year, self.day)) {
+            OpenOptions::new()
+                .append(true)
+                .open("Cargo.toml")
+                .expect("failed to open Cargo.toml")
+                .write_all(
+                    "
+[[bin]]
+name = \"{{YEAR}}-{{DAY}}\"
+path = \"src/{{YEAR}}/{{DAY}}.rs\"
+"
+                    .replace("{{DAY}}", &format!("{:02}", self.day))
+                    .replace("{{YEAR}}", &self.year.to_string())
+                    .as_bytes(),
+                )
+                .expect("failed to append to Cargo.toml");
+        }
     }
 
     fn time(&self, run_all: bool, store: bool) {
         let stored_timings = Timings::read_from_file();
 
         let days_to_run = if run_all {
-            all_days().collect()
+            days().collect()
         } else {
-            HashSet::from([Day::new(self.day as u8).unwrap()])
+            HashSet::from([self.day])
             // when the `--all` flag is not set, filter out days that are fully benched.
             // all_days()
             //     .filter(|day| !stored_timings.is_day_complete(*day))
@@ -250,10 +241,11 @@ mod tests {
     }
 }
 
-fn write_file(path: &str, contents: &str, replace: bool) {
-    let path = Path::new(path);
+fn write_file(path_str: &str, contents: &str, replace: bool) {
+    let path = Path::new(path_str);
 
     if path.exists() && !replace {
+        println!("Skipping file creation: '{path_str}' exists");
         return;
     }
 
@@ -268,4 +260,5 @@ fn write_file(path: &str, contents: &str, replace: bool) {
         .expect("new file should be created")
         .write_all(contents.as_bytes())
         .expect("content should be written");
+    println!("Created file '{path_str}'");
 }

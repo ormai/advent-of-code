@@ -5,10 +5,16 @@ use std::io::{Write, stdout};
 use std::time::{Duration, Instant};
 use std::{cmp, env, process};
 
-use crate::template::{Part, ANSI_BOLD};
-use crate::template::{ANSI_ITALIC, ANSI_RESET};
+use crate::solution::{ANSI_BOLD, Part, aoc_client};
+use crate::solution::{ANSI_ITALIC, ANSI_RESET};
 
-pub fn run_part<I: Copy, T: Display>(func: impl Fn(I) -> Option<T>, input: I, year: i32, day: u32, part: Part) {
+pub fn run_part<I: Copy, T: Display>(
+    func: impl Fn(I) -> Option<T>,
+    input: I,
+    year: i32,
+    day: u32,
+    part: Part,
+) {
     let part_str = format!("Part {part}");
 
     let (result, duration, samples) =
@@ -124,9 +130,7 @@ fn print_result<T: Display>(result: &Option<T>, part: &str, duration_str: &str) 
     }
 }
 
-/// Parse the arguments passed to `solve` and try to submit one part of the solution if:
-///  1. we are in `--release` mode.
-///  2. aoc-cli is installed.
+/// Parse the arguments passed to `solve` and try to submit one part of the solution if we are in `--release` mode.
 fn submit_result<T: Display>(result: T, year: i32, day: u32, part: Part) {
     let args: Vec<String> = env::args().collect();
 
@@ -150,15 +154,15 @@ fn submit_result<T: Display>(result: T, year: i32, day: u32, part: Part) {
         return;
     }
 
-    // if aoc_cli::check().is_err() {
-    //     eprintln!(
-    //         "command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it."
-    //     );
-    //     process::exit(1);
-    // }
-    //
-    // TODO: add call aoc_client
-
     println!("Submitting result...");
-    // Some(aoc_cli::submit(day, part, &result.to_string()))
+
+    let part = match part {
+        Part::Both => panic!("Cannot send both parts"),
+        Part::One => 1,
+        Part::Two => 2,
+    };
+    aoc_client(year, day)
+        .expect("Failed to create AocClient")
+        .submit_answer_and_show_outcome(part, result)
+        .expect("failed to submit result")
 }

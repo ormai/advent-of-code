@@ -1,18 +1,25 @@
-use std::{env, fmt::Display, fs, str::FromStr};
+use aoc_client::{AocClient, AocResult};
+use std::{env, fmt::Display, fs, ops::RangeInclusive, str::FromStr};
 
-pub mod aoc_cli;
+pub mod readme_benchmarks;
 pub mod run_multi;
 pub mod runner;
-
-pub use day::*;
-
-pub mod day;
-pub mod readme_benchmarks;
 pub mod timings;
 
 pub const ANSI_ITALIC: &str = "\x1b[3m";
 pub const ANSI_BOLD: &str = "\x1b[1m";
 pub const ANSI_RESET: &str = "\x1b[0m";
+
+pub fn aoc_client(year: i32, day: u32) -> AocResult<AocClient> {
+    AocClient::builder()
+        .session_cookie_from_default_locations()?
+        .year(year)?
+        .day(day)?
+        .input_filename(format!("data/inputs/{year}/{day:02}.txt"))
+        .puzzle_filename(format!("data/puzzles/{year}/{day:02}.md"))
+        .overwrite_files(true)
+        .build()
+}
 
 #[derive(PartialEq)]
 pub enum Part {
@@ -41,6 +48,11 @@ impl Display for Part {
     }
 }
 
+pub fn days() -> RangeInclusive<u32> {
+    // FIXME: knowledge of the year is necessary because 2025 has 12 instead of 25 puzzels
+    0..=25
+}
+
 impl FromStr for Part {
     type Err = String;
 
@@ -65,9 +77,9 @@ pub fn read_file(folder: &str, year: i32, day: u32, part: Part) -> String {
     fs::read_to_string(filepath).expect("Could not open input file")
 }
 
-/// Creates the constant `DAY` and sets up the input and runner for each part.
+/// Creates the constants `YEAR`, and `DAY` and sets up the input and runner for each part.
 ///
-/// The optional, third parameter (1 or 2) allows you to only run a single part of the solution.
+/// The optional, third parameter (`Part`) allows you to only run a single part of the solution.
 #[macro_export]
 macro_rules! solution {
     ($year:expr, $day:expr) => {
@@ -81,6 +93,8 @@ macro_rules! solution {
     };
 
     (@impl $year:expr, @impl $day:expr, $( [$func:expr, $part:expr] )*) => {
+        use $crate::solution::{read_file, Part};
+
         /// The current year.
         const YEAR: i32 = $year;
         /// The current day.
@@ -91,9 +105,8 @@ macro_rules! solution {
         static ALLOC: dhat::Alloc = dhat::Alloc;
 
         fn main() {
-            use $crate::template::runner::*;
-            use $crate::template::*;
-            let input = $crate::template::read_file("inputs", YEAR, DAY, Part::Both);
+            use $crate::solution::runner::*;
+            let input = read_file("inputs", YEAR, DAY, Part::Both);
             $( run_part($func, &input, YEAR, DAY, $part); )*
         }
     };

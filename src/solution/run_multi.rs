@@ -1,19 +1,14 @@
+use super::timings::{Timing, Timings};
+use crate::solution::{ANSI_BOLD, ANSI_ITALIC, ANSI_RESET, days};
 use std::{collections::HashSet, io};
 
-use crate::template::{ANSI_BOLD, ANSI_ITALIC, ANSI_RESET, Day};
-
-use super::{
-    all_days,
-    timings::{Timing, Timings},
-};
-
-pub fn run_multi(days_to_run: &HashSet<Day>, is_release: bool, is_timed: bool) -> Option<Timings> {
+pub fn run_multi(days_to_run: &HashSet<u32>, is_release: bool, is_timed: bool) -> Option<Timings> {
     let mut timings: Vec<Timing> = Vec::with_capacity(days_to_run.len());
 
     let mut need_space = false;
 
     // NOTE: use non-duplicate, sorted day values.
-    all_days()
+    days()
         .filter(|day| days_to_run.contains(day))
         .for_each(|day| {
             if need_space {
@@ -60,7 +55,7 @@ impl From<std::io::Error> for Error {
 }
 
 #[must_use]
-pub fn get_path_for_bin(day: Day) -> String {
+pub fn get_path_for_bin(day: u32) -> String {
     format!("./src/bin/{day}.rs")
 }
 
@@ -68,7 +63,6 @@ pub fn get_path_for_bin(day: Day) -> String {
 /// This module encapsulates interaction with these binaries, both invoking them as well as parsing the timing output.
 pub mod child_commands {
     use super::{Error, get_path_for_bin};
-    use crate::template::Day;
     use std::{
         io::{BufRead, BufReader},
         path::Path,
@@ -77,7 +71,7 @@ pub mod child_commands {
     };
 
     /// Run the solution bin for a given day
-    pub fn run_solution(day: Day, is_timed: bool, is_release: bool) -> Result<Vec<String>, Error> {
+    pub fn run_solution(day: u32, is_timed: bool, is_release: bool) -> Result<Vec<String>, Error> {
         // skip command invocation for days that have not been scaffolded yet.
         if !Path::new(&get_path_for_bin(day)).exists() {
             return Ok(vec![]);
@@ -128,7 +122,7 @@ pub mod child_commands {
         Ok(output)
     }
 
-    pub fn parse_exec_time(output: &[String], day: Day) -> super::Timing {
+    pub fn parse_exec_time(output: &[String], day: u32) -> super::Timing {
         let mut timings = super::Timing {
             day,
             part_1: None,
@@ -174,7 +168,7 @@ pub mod child_commands {
             .split(" samples)")
             .next()?
             .split('(')
-            .last()?
+            .next_back()?
             .split('@')
             .next()?
             .trim();
