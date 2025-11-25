@@ -2,14 +2,13 @@
 use std::fmt::Display;
 use std::hint::black_box;
 use std::io::{Write, stdout};
-use std::process::Output;
 use std::time::{Duration, Instant};
 use std::{cmp, env, process};
 
-use crate::template::ANSI_BOLD;
-use crate::template::{ANSI_ITALIC, ANSI_RESET, Day, aoc_cli};
+use crate::template::{Part, ANSI_BOLD};
+use crate::template::{ANSI_ITALIC, ANSI_RESET};
 
-pub fn run_part<I: Copy, T: Display>(func: impl Fn(I) -> Option<T>, input: I, day: Day, part: u8) {
+pub fn run_part<I: Copy, T: Display>(func: impl Fn(I) -> Option<T>, input: I, year: i32, day: u32, part: Part) {
     let part_str = format!("Part {part}");
 
     let (result, duration, samples) =
@@ -18,7 +17,7 @@ pub fn run_part<I: Copy, T: Display>(func: impl Fn(I) -> Option<T>, input: I, da
     print_result(&result, &part_str, &format_duration(&duration, samples));
 
     if let Some(result) = result {
-        submit_result(result, day, part);
+        submit_result(result, year, day, part);
     }
 }
 
@@ -128,15 +127,11 @@ fn print_result<T: Display>(result: &Option<T>, part: &str, duration_str: &str) 
 /// Parse the arguments passed to `solve` and try to submit one part of the solution if:
 ///  1. we are in `--release` mode.
 ///  2. aoc-cli is installed.
-fn submit_result<T: Display>(
-    result: T,
-    day: Day,
-    part: u8,
-) -> Option<Result<Output, aoc_cli::AocCommandError>> {
+fn submit_result<T: Display>(result: T, year: i32, day: u32, part: Part) {
     let args: Vec<String> = env::args().collect();
 
     if !args.contains(&"--submit".into()) {
-        return None;
+        return;
     }
 
     if args.len() < 3 {
@@ -146,22 +141,24 @@ fn submit_result<T: Display>(
 
     let part_index = args.iter().position(|x| x == "--submit").unwrap() + 1;
 
-    let Ok(part_submit) = args[part_index].parse::<u8>() else {
+    let Ok(part_submit) = args[part_index].parse::<Part>() else {
         eprintln!("Unexpected command-line input. Format: cargo solve 1 --submit 1");
         process::exit(1);
     };
 
     if part_submit != part {
-        return None;
+        return;
     }
 
-    if aoc_cli::check().is_err() {
-        eprintln!(
-            "command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it."
-        );
-        process::exit(1);
-    }
+    // if aoc_cli::check().is_err() {
+    //     eprintln!(
+    //         "command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it."
+    //     );
+    //     process::exit(1);
+    // }
+    //
+    // TODO: add call aoc_client
 
-    println!("Submitting result via aoc-cli...");
-    Some(aoc_cli::submit(day, part, &result.to_string()))
+    println!("Submitting result...");
+    // Some(aoc_cli::submit(day, part, &result.to_string()))
 }

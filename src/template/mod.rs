@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{env, fmt::Display, fs, str::FromStr};
 
 pub mod aoc_cli;
 pub mod run_multi;
@@ -14,45 +14,77 @@ pub const ANSI_ITALIC: &str = "\x1b[3m";
 pub const ANSI_BOLD: &str = "\x1b[1m";
 pub const ANSI_RESET: &str = "\x1b[0m";
 
-/// Helper function that reads a text file to a string.
-#[must_use]
-pub fn read_file(folder: &str, day: Day) -> String {
-    let cwd = env::current_dir().unwrap();
-    let filepath = cwd.join("data").join(folder).join(format!("{day}.txt"));
-    let f = fs::read_to_string(filepath);
-    f.expect("could not open input file")
+#[derive(PartialEq)]
+pub enum Part {
+    Both,
+    One,
+    Two,
 }
 
-/// Helper function that reads a text file to string, appending a part suffix. E.g. like `01-2.txt`.
+impl Part {
+    fn path_suffix(&self) -> String {
+        match self {
+            Part::Both => "".to_string(),
+            _ => format!("-{self}"),
+        }
+    }
+}
+
+/// Writes! the path component relative to a Puzzle Part
+impl Display for Part {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Part::Both => panic!("Not representable"),
+            Part::One => write!(f, "1"),
+            Part::Two => write!(f, "2"),
+        }
+    }
+}
+
+impl FromStr for Part {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim() {
+            "1" => Ok(Part::One),
+            "2" => Ok(Part::Two),
+            _ => Err(format!("Cannot build part from string: {s}")),
+        }
+    }
+}
+
+/// Reads a text file to a string. The part suffix is appended. E.g. like `01-2.txt`.
 #[must_use]
-pub fn read_file_part(folder: &str, day: Day, part: u8) -> String {
+pub fn read_file(folder: &str, year: i32, day: u32, part: Part) -> String {
     let cwd = env::current_dir().unwrap();
     let filepath = cwd
         .join("data")
         .join(folder)
-        .join(format!("{day}-{part}.txt"));
-    let f = fs::read_to_string(filepath);
-    f.expect("could not open input file")
+        .join(year.to_string())
+        .join(format!("{day:02}{}.txt", part.path_suffix()));
+    fs::read_to_string(filepath).expect("Could not open input file")
 }
 
 /// Creates the constant `DAY` and sets up the input and runner for each part.
 ///
-/// The optional, second parameter (1 or 2) allows you to only run a single part of the solution.
+/// The optional, third parameter (1 or 2) allows you to only run a single part of the solution.
 #[macro_export]
 macro_rules! solution {
-    ($day:expr) => {
-        $crate::solution!(@impl $day, [part_one, 1] [part_two, 2]);
+    ($year:expr, $day:expr) => {
+        $crate::solution!(@impl $year, @impl $day, [part_one, Part::One] [part_two, Part::Two]);
     };
-    ($day:expr, 1) => {
-        $crate::solution!(@impl $day, [part_one, 1]);
+    ($year:expr, $day:expr, 1) => {
+        $crate::solution!(@impl $year, @impl $day, [part_one, Part::One]);
     };
-    ($day:expr, 2) => {
-        $crate::solution!(@impl $day, [part_two, 2]);
+    ($year:expr, $day:expr, 2) => {
+        $crate::solution!(@impl $year, @impl $day, [part_two, Part::Two]);
     };
 
-    (@impl $day:expr, $( [$func:expr, $part:expr] )*) => {
+    (@impl $year:expr, @impl $day:expr, $( [$func:expr, $part:expr] )*) => {
+        /// The current year.
+        const YEAR: i32 = $year;
         /// The current day.
-        const DAY: $crate::template::Day = $crate::day!($day);
+        const DAY: u32 = $day;
 
         #[cfg(feature = "dhat-heap")]
         #[global_allocator]
@@ -60,8 +92,9 @@ macro_rules! solution {
 
         fn main() {
             use $crate::template::runner::*;
-            let input = $crate::template::read_file("inputs", DAY);
-            $( run_part($func, &input, DAY, $part); )*
+            use $crate::template::*;
+            let input = $crate::template::read_file("inputs", YEAR, DAY, Part::Both);
+            $( run_part($func, &input, YEAR, DAY, $part); )*
         }
     };
 }
