@@ -1,4 +1,4 @@
-name: Cargo
+name: Cargo Continuous Integration
 
 on: [push]
 
@@ -8,7 +8,9 @@ env:
 jobs:
     cargo:
         runs-on: docker
-        name: Continuous Integration
+        container:
+          image: rust:latest
+        name: Cargo Continuous Integration
         steps:
             - uses: actions/checkout@v4
             - name: Set up cargo cache
@@ -25,7 +27,9 @@ jobs:
                 restore-keys: ${{ runner.os }}-cargo-
             - name: cargo test
               run: cargo test
+
             - name: cargo clippy
               run: cargo clippy -- -D warnings
+
             - name: cargo fmt
               run: cargo fmt --check
