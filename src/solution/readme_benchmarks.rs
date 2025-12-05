@@ -98,7 +98,7 @@ pub fn update(timings: Timings) -> Result<(), Error> {
 
 #[cfg(feature = "test_lib")]
 mod tests {
-    use super::{update_content, MARKER};
+    use super::{MARKER, update_content};
     use crate::{day, template::timings::Timing, template::timings::Timings};
 
     fn get_mock_timings() -> Timings {
