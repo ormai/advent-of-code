@@ -114,7 +114,7 @@ impl Puzzle {
         Self { year, day, client }
     }
 
-    /// Runs a solution against the expamples
+    /// Runs a solution against the input
     fn solve(&self, release: bool, dhat: bool, submit_part: Option<u8>) {
         let mut args = vec![
             "run".to_string(),
@@ -149,7 +149,8 @@ impl Puzzle {
         cmd.wait().unwrap();
     }
 
-    /// Creates the solution file from a template. Downloads the input, the example, and the puzzle description.
+    /// Creates the solution file from a template. Downloads the input and the puzzle description.
+    /// The example(s) must be added manually.
     ///
     /// Adds a new `[[bin]]` table to Cargo.toml.
     /// Solution: src/{year}/{day}.rs
