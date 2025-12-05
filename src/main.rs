@@ -1,13 +1,14 @@
-use aoc::solution::days;
-use aoc::solution::{aoc_client, readme_benchmarks, run_multi::run_multi, timings::Timings};
+use aoc::solution::{aoc_client, days, readme_benchmarks, run_multi::run_multi, timings::Timings};
 use aoc_client::AocClient;
 use chrono::{Datelike, FixedOffset, Utc};
 use clap::{ArgAction, Command, arg, command, value_parser};
-use std::fs::{self, File, OpenOptions};
-use std::io::{Read, Write};
-use std::path::Path;
-use std::process;
-use std::{collections::HashSet, process::Stdio};
+use std::{
+    collections::HashSet,
+    fs::{self, File, OpenOptions},
+    io::{Read, Write},
+    path::Path,
+    process,
+};
 
 fn main() {
     let matches = cli().get_matches();
@@ -141,8 +142,8 @@ impl Puzzle {
 
         let mut cmd = process::Command::new("cargo")
             .args(&args)
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
+            .stdout(process::Stdio::inherit())
+            .stderr(process::Stdio::inherit())
             .spawn()
             .unwrap();
         cmd.wait().unwrap();
@@ -158,72 +159,93 @@ impl Puzzle {
     /// If run more than once on a puzzle it will overwrite puzzle description and input. Examples, solution, and
     /// Cargo.toml are not touched.
     fn scaffold(&self) {
-        let solution_path = format!("src/{}/{:02}.rs", self.year, self.day);
-
         write_file(
-            &solution_path,
-            &"aoc::solution!({{YEAR}}, {{DAY}});
+            &format!("src/{}/{:02}.rs", self.year, self.day),
+            &format!(
+                "aoc::solution!({}, {});
 
-pub fn part_one(input: &str) -> Option<u64> {
+pub fn part_one(input: &str) -> Option<u64> {{
     None
-}
+}}
 
-pub fn part_two(input: &str) -> Option<u64> {
+pub fn part_two(input: &str) -> Option<u64> {{
     None
-}
+}}
 
 #[cfg(test)]
-mod tests {
+mod tests {{
     use super::*;
 
     #[test]
-    fn test_part_one() {
+    fn test_part_one() {{
         let result = part_one(&read_file(\"examples\", YEAR, DAY, Part::One));
         assert_eq!(result, None);
-    }
+    }}
 
     #[test]
-    fn test_part_two() {
+    fn test_part_two() {{
         let result = part_two(&read_file(\"examples\", YEAR, DAY, Part::Two));
         assert_eq!(result, None);
-    }
-}
-"
-            .replace("{{DAY}}", &self.day.to_string())
-            .replace("{{YEAR}}", &self.year.to_string()),
+    }}
+}}
+",
+                self.year, self.day
+            ),
             false,
         );
 
-        fs::create_dir_all(format!("data/inputs/{}", self.year))
-            .expect("Ancestors should be created");
-        self.client.save_input().expect("failed to download input");
-        fs::create_dir_all(format!("data/puzzles/{}", self.year))
-            .expect("Ancestors should be created");
-        self.client
-            .save_puzzle_markdown()
-            .expect("failed to download puzzle");
+        let input_file = format!("data/inputs/{}/{:02}.txt", self.year, self.day);
+        let input_file = Path::new(&input_file);
+        fs::create_dir_all(
+            input_file
+                .parent()
+                .expect("Input file path has a parent directory"),
+        )
+        .expect("Ancestors should be created");
+        match self.client.save_input() {
+            Ok(()) => println!("Created input file {input_file:?}"),
+            Err(err) => eprintln!("Failed to create input file {input_file:?}: {err:?}"),
+        }
 
-        let mut contents = String::new();
+        let puzzle_file = format!("data/puzzles/{}/{:02}.md", self.year, self.day);
+        let puzzle_file = Path::new(&puzzle_file);
+        fs::create_dir_all(
+            puzzle_file
+                .parent()
+                .expect("Puzzle file has a parent directory"),
+        )
+        .expect("Ancestors should be created");
+        match self.client.save_puzzle_markdown() {
+            Ok(()) => println!("Created puzzle file {puzzle_file:?}"),
+            Err(err) => eprintln!("Failed to reate puzzle file {puzzle_file:?}: {err:?}"),
+        }
+
+        let mut cargo_toml = String::new();
         File::open("Cargo.toml")
             .expect("failed to open Cargo.toml")
-            .read_to_string(&mut contents)
+            .read_to_string(&mut cargo_toml)
             .expect("failed to read Cargo.toml");
-        if !contents.contains(&format!("{}-{:02}", self.year, self.day)) {
+
+        if !cargo_toml.contains(&format!("name = \"{}-{:02}\"", self.year, self.day)) {
             OpenOptions::new()
                 .append(true)
                 .open("Cargo.toml")
                 .expect("failed to open Cargo.toml")
                 .write_all(
-                    "
+                    format!(
+                        "
 [[bin]]
-name = \"{{YEAR}}-{{DAY}}\"
-path = \"src/{{YEAR}}/{{DAY}}.rs\"
-"
-                    .replace("{{DAY}}", &format!("{:02}", self.day))
-                    .replace("{{YEAR}}", &self.year.to_string())
+name = \"{0}-{1:02}\"
+path = \"src/{0}/{1:02}.rs\")
+",
+                        self.year, self.day
+                    )
                     .as_bytes(),
                 )
                 .expect("failed to append to Cargo.toml");
+            println!("New solution configuration appended to Cargo.toml")
+        } else {
+            println!("Skipping editing Cargo.toml")
         }
     }
 
