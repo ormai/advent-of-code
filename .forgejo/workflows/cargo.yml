@@ -8,6 +8,8 @@ env:
 jobs:
     cargo:
         runs-on: docker
+        container:
+          image: ormai/rust-node:latest
         name: Cargo Continuous Integration
         steps:
             - uses: actions/checkout@v4
