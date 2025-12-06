@@ -160,7 +160,7 @@ impl Puzzle {
     /// If run more than once on a puzzle it will overwrite puzzle description and input. Examples, solution, and
     /// Cargo.toml are not touched.
     fn scaffold(&self) {
-        write_file(
+        create_solution_file(
             &format!("src/{}/{:02}.rs", self.year, self.day),
             &format!(
                 "aoc::solution!({}, {});
@@ -237,7 +237,7 @@ mod tests {{
                         "
 [[bin]]
 name = \"{0}-{1:02}\"
-path = \"src/{0}/{1:02}.rs\")
+path = \"src/{0}/{1:02}.rs\"
 ",
                         self.year, self.day
                     )
@@ -276,11 +276,11 @@ path = \"src/{0}/{1:02}.rs\")
     }
 }
 
-fn write_file(path_str: &str, contents: &str, replace: bool) {
+fn create_solution_file(path_str: &str, contents: &str, replace: bool) {
     let path = Path::new(path_str);
 
     if path.exists() && !replace {
-        println!("Skipping file creation: '{path_str}' exists");
+        println!("Skipping file creation: \"{path_str}\" exists");
         return;
     }
 
@@ -295,5 +295,5 @@ fn write_file(path_str: &str, contents: &str, replace: bool) {
         .expect("new file should be created")
         .write_all(contents.as_bytes())
         .expect("content should be written");
-    println!("Created file '{path_str}'");
+    println!("Created solution file \"{path_str}\"");
 }
