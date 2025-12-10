@@ -79,7 +79,7 @@ fn transpose<T: Copy>(mat: &[Vec<T>]) -> Vec<Vec<T>> {
     }
 }
 
-/// Parses the last line of the input, returning a Vec conaining only b'+' or b'*'
+/// Parses the last line of the input, returning a Vec containing only b'+' or b'*'
 fn parse_operators(input: &str) -> Option<Vec<u8>> {
     input
         .lines()
