@@ -1,13 +1,21 @@
 use std::collections::{HashMap, HashSet};
 
-const INPUT: &str = include_str!("../input");
+aoc::solution!(2024, 12);
 
-fn main() {
-    determine_regions(INPUT.lines().map(|line| line.chars().collect()).collect());
+// FIXME: finish me
+
+pub fn part_one(input: &str) -> Option<u64> {
+    None
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    None
 }
 
 /// Build a map of letters to regions of that letter
-fn determine_regions(map: Vec<Vec<char>>) -> HashMap<char, Vec<HashSet<(usize, usize)>>> {
+fn determine_regions(input: &str) -> HashMap<char, Vec<HashSet<(usize, usize)>>> {
+    let map = parse_grid(input);
+
     let mut regions: HashMap<char, Vec<HashSet<(usize, usize)>>> = HashMap::new();
     for r in 0..map.len() {
         for c in 0..map[r].len() {
@@ -42,4 +50,26 @@ fn orthogonally_adjacent(r: usize, c: usize, other_r: usize, other_c: usize) -> 
     let dr = r.abs_diff(other_r);
     let dc = c.abs_diff(other_c);
     (dr == 1 || dc == 1) && dr + dc == 1
+}
+
+fn parse_grid(input: &str) -> Vec<Vec<char>> {
+    input.lines().map(|line| line.chars().collect()).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_part_one() {
+        let result = part_one(&read_file("examples", YEAR, DAY, Part::Both));
+        // assert_eq!(result, Some(1930));
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let result = part_two(&read_file("examples", YEAR, DAY, Part::Both));
+        assert_eq!(result, None);
+    }
 }
